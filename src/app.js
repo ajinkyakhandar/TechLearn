@@ -34,15 +34,33 @@ let users = [
     res.status(201).json(newUser);  // Return the new user with status 201 (Created)
   });
   
-  // 4. PUT (Update an existing user by ID)
-  app.put('/users/:id', (req, res) => {
+// 4. PUT (Update an existing user by replacing all fields)
+app.put('/users/:id', (req, res) => {
     const userId = parseInt(req.params.id);
     const user = users.find(u => u.id === userId);
     if (user) {
-      // Update user details
+      // Update all fields
       user.name = req.body.name;
       user.age = req.body.age;
       res.json(user);  // Return the updated user
+    } else {
+      res.status(404).send('User not found');
+    }
+  });
+  
+  // 5. PATCH (Partially update user fields)
+  app.patch('/users/:id', (req, res) => {
+    const userId = parseInt(req.params.id);
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      // Only update fields that are provided in the request body
+      if (req.body.name !== undefined) {
+        user.name = req.body.name;
+      }
+      if (req.body.age !== undefined) {
+        user.age = req.body.age;
+      }
+      res.json(user);  // Return the partially updated user
     } else {
       res.status(404).send('User not found');
     }
@@ -59,7 +77,7 @@ let users = [
       res.status(404).send('User not found');
     }
   });
-  
+
 // Start the server and listen on port 3000
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
